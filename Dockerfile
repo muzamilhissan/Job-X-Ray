@@ -26,4 +26,3 @@ COPY packages/shared-types/package.json packages/shared-types/package.json
 WORKDIR /app/apps/api
 EXPOSE 8787
 CMD ["node", "dist/index.js"]
-EOF

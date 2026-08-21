@@ -7,4 +7,3 @@ apps/extension
 *.md
 apps/api/.env
 apps/api/logs
-EOF
