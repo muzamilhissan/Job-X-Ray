@@ -1,0 +1,28 @@
+# Job X-Ray API — Render Blueprint
+# Dashboard: New → Blueprint → this repo
+# After deploy, health is https://<service-name>.onrender.com/health
+services:
+  - type: web
+    name: job-xray-api
+    runtime: node
+    plan: starter
+    region: oregon
+    rootDir: .
+    buildCommand: npm ci --include=dev && npm run build -w @job-xray/shared-types && npm run build -w @job-xray/api
+    startCommand: npm run start -w @job-xray/api
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: AI_PROVIDER
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash-lite
+      - key: LOG_LEVEL
+        value: info
+      - key: GEMINI_API_KEY
+        sync: false

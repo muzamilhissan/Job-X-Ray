@@ -1,0 +1,10 @@
+node_modules
+**/node_modules
+**/dist
+.git
+.cursor
+apps/extension
+*.md
+apps/api/.env
+apps/api/logs
+EOF

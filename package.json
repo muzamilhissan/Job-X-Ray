@@ -1,0 +1,22 @@
+{
+  "name": "job-xray",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w @job-xray/api",
+    "dev:extension": "npm run dev -w @job-xray/extension",
+    "build:api": "npm run build -w @job-xray/shared-types && npm run build -w @job-xray/api",
+    "start:api": "npm run start -w @job-xray/api",
+    "install:api-service": "bash scripts/install-macos-service.sh",
+    "uninstall:api-service": "bash scripts/uninstall-macos-service.sh",
+    "build": "npm run build -w @job-xray/shared-types && npm run build -w @job-xray/api && npm run build -w @job-xray/extension",
+    "typecheck": "npm run typecheck -w @job-xray/shared-types && npm run typecheck -w @job-xray/api && npm run typecheck -w @job-xray/extension"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
