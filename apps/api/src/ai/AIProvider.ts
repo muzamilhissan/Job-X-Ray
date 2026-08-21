@@ -2,6 +2,7 @@ import type { AnalyzeJobRequest, CoverLetterRequest, JobAnalysis } from "@job-xr
 
 export interface AIProvider {
   readonly name: string;
+  readonly model?: string;
   isConfigured(): boolean;
   analyzeJob(input: AnalyzeJobRequest): Promise<JobAnalysis>;
   draftCoverLetter(input: CoverLetterRequest): Promise<string>;

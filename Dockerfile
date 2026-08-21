@@ -8,6 +8,8 @@ RUN npm ci
 
 COPY packages/shared-types packages/shared-types
 COPY apps/api apps/api
+# Bust stale Render layers that still sent thinkingBudget: 0
+ENV XRAY_BUILD=20260821-no-thinking-budget
 RUN npm run build -w @job-xray/shared-types && npm run build -w @job-xray/api
 
 FROM node:20-alpine

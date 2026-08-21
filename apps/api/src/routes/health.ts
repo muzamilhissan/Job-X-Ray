@@ -11,6 +11,7 @@ healthRouter.get("/", (req, res) => {
     ai: {
       provider: ai.name,
       configured: ai.isConfigured(),
+      model: ai.model,
     },
   };
   res.json(body);

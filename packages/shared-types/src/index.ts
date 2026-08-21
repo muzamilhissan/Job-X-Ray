@@ -73,5 +73,6 @@ export interface HealthResponse {
   ai: {
     provider: string;
     configured: boolean;
+    model?: string;
   };
 }

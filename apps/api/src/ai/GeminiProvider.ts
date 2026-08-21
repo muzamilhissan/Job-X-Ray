@@ -60,12 +60,14 @@ const jobAnalysisResponseSchema = {
 
 export class GeminiProvider implements AIProvider {
   readonly name = "gemini";
+  readonly model: string;
   private readonly client: GoogleGenerativeAI | null;
   private readonly modelName: string;
 
   constructor(apiKey: string | undefined, modelName = process.env.GEMINI_MODEL ?? DEFAULT_MODEL) {
     this.client = apiKey ? new GoogleGenerativeAI(apiKey) : null;
     this.modelName = resolveModelName(modelName);
+    this.model = this.modelName;
   }
 
   isConfigured(): boolean {
@@ -135,7 +137,6 @@ export class GeminiProvider implements AIProvider {
       {
         model: modelName,
         generationConfig: {
-          temperature,
           maxOutputTokens: 1024,
           responseMimeType: "application/json",
           responseSchema: jobAnalysisResponseSchema,
@@ -160,7 +161,6 @@ export class GeminiProvider implements AIProvider {
       {
         model: modelName,
         generationConfig: {
-          temperature,
           maxOutputTokens: 1200,
         },
       },

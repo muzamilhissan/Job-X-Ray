@@ -56,7 +56,7 @@ app.get("/", (req, res) => {
     ok: true,
     service: "Job X-Ray API",
     health: "/health",
-    ai: { provider: provider.name, configured: provider.isConfigured() },
+    ai: { provider: provider.name, configured: provider.isConfigured(), model: provider.model },
   });
 });
 
@@ -82,5 +82,15 @@ app.use(
 );
 
 app.listen(port, host, () => {
-  log.info({ host, port, provider: ai.name, configured: ai.isConfigured() }, "Job X-Ray API listening");
+  log.info(
+    {
+      host,
+      port,
+      provider: ai.name,
+      model: ai.model,
+      configured: ai.isConfigured(),
+      geminiConfig: "json-schema,no-thinkingBudget",
+    },
+    "Job X-Ray API listening",
+  );
 });
