@@ -15,7 +15,8 @@ import { jobAnalysisSchemaHint } from "./prompts/schemaHint.js";
 import { JobAnalysisSchema } from "../validation/jobAnalysis.js";
 
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
-const REQUEST_TIMEOUT_MS = 20_000;
+/** Render will cut HTTP at ~60s; stay under that, but 20s was aborting mid-response. */
+const REQUEST_TIMEOUT_MS = 50_000;
 
 /** Retired IDs still sitting in Render/.env → current lite model. */
 const MODEL_ALIASES: Record<string, string> = {
@@ -90,7 +91,10 @@ export class GeminiProvider implements AIProvider {
     try {
       return await fn();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
+        const msg = err instanceof Error ? err.message : String(err);
+      if (/aborted|AbortError|This operation was aborted/i.test(msg)) {
+        throw new Error("Gemini took too long. Try X-Ray again.");
+      }
       if (!/503|high demand|overloaded|unavailable|RESOURCE_EXHAUSTED/i.test(msg)) {
         throw err;
       }
@@ -143,7 +147,7 @@ export class GeminiProvider implements AIProvider {
       {
         model: modelName,
         generationConfig: {
-          maxOutputTokens: 8192,
+          maxOutputTokens: 4096,
           responseMimeType: "application/json",
           responseSchema: jobAnalysisResponseSchema,
           thinkingConfig: { thinkingLevel: "minimal" },
