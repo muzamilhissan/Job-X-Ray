@@ -44,12 +44,28 @@ export function coerceJobAnalysis(raw: unknown): unknown {
   }
 
   const rec = String(o.recommendation ?? "").toUpperCase();
+  const strongMatches = clipSkills(o.strongMatches);
+  const skillGaps = clipSkills(o.skillGaps);
+  let matchScore = Math.min(100, Math.max(0, Number(o.matchScore) || 0));
+  let recommendation: "APPLY" | "MAYBE" | "SKIP" =
+    rec === "APPLY" || rec === "MAYBE" || rec === "SKIP" ? rec : "MAYBE";
+
+  if (strongMatches.length === 0) {
+    matchScore = Math.min(matchScore, 8);
+    recommendation = "SKIP";
+  } else if (skillGaps.length >= 3 && strongMatches.length <= 1) {
+    matchScore = Math.min(matchScore, 22);
+  }
+
+  if (matchScore < 45) recommendation = "SKIP";
+  else if (matchScore < 70 && recommendation === "APPLY") recommendation = "MAYBE";
+
   return {
     roleSummary: clip(o.roleSummary, 160),
-    matchScore: Math.min(100, Math.max(0, Number(o.matchScore) || 0)),
-    strongMatches: clipSkills(o.strongMatches),
-    skillGaps: clipSkills(o.skillGaps),
+    matchScore,
+    strongMatches,
+    skillGaps,
     experienceGap,
-    recommendation: rec === "APPLY" || rec === "MAYBE" || rec === "SKIP" ? rec : "MAYBE",
+    recommendation,
   };
 }
