@@ -15,8 +15,19 @@ import { buildCoverLetterPrompt } from "./prompts/coverLetter.js";
 import { jobAnalysisSchemaHint } from "./prompts/schemaHint.js";
 import { JobAnalysisSchema } from "../validation/jobAnalysis.js";
 
-const DEFAULT_MODEL = "gemini-2.5-flash-lite";
+const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 const REQUEST_TIMEOUT_MS = 20_000;
+
+/** Retired IDs still sitting in Render/.env → current lite model. */
+const MODEL_ALIASES: Record<string, string> = {
+  "gemini-2.5-flash-lite": "gemini-3.5-flash-lite",
+  "gemini-2.0-flash-lite": "gemini-3.5-flash-lite",
+  "gemini-2.5-flash": "gemini-3.5-flash",
+};
+
+function resolveModelName(requested: string): string {
+  return MODEL_ALIASES[requested] ?? requested;
+}
 
 /** Stay on the configured fast model. Falling back to Flash / 3.6 is what made scans feel slow. */
 const RETRY_DELAY_MS = 350;
@@ -63,7 +74,7 @@ export class GeminiProvider implements AIProvider {
 
   constructor(apiKey: string | undefined, modelName = process.env.GEMINI_MODEL ?? DEFAULT_MODEL) {
     this.client = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-    this.modelName = modelName;
+    this.modelName = resolveModelName(modelName);
   }
 
   isConfigured(): boolean {
