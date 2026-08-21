@@ -50,6 +50,16 @@ app.use(pinoHttp({ logger: log }));
 
 app.locals.ai = ai;
 
+app.get("/", (req, res) => {
+  const provider = req.app.locals.ai as ReturnType<typeof createAIProvider>;
+  res.json({
+    ok: true,
+    service: "Job X-Ray API",
+    health: "/health",
+    ai: { provider: provider.name, configured: provider.isConfigured() },
+  });
+});
+
 app.use("/health", healthRouter);
 app.use("/api/analyze-job", analyzeRouter);
 app.use("/api/cv", cvRouter);
