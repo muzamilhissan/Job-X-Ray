@@ -1,7 +1,6 @@
 import {
   GoogleGenerativeAI,
   SchemaType,
-  type GenerationConfig,
   type ResponseSchema,
 } from "@google/generative-ai";
 import type {
@@ -58,14 +57,6 @@ const jobAnalysisResponseSchema = {
   },
   required: ["roleSummary", "matchScore", "strongMatches", "skillGaps", "recommendation"],
 } as unknown as ResponseSchema;
-
-/** thinkingBudget: 0 disables Gemini 2.5 reasoning tokens (the main latency source on this model). */
-function withNoThinking(config: GenerationConfig): GenerationConfig {
-  return {
-    ...config,
-    thinkingConfig: { thinkingBudget: 0 },
-  } as GenerationConfig;
-}
 
 export class GeminiProvider implements AIProvider {
   readonly name = "gemini";
@@ -143,12 +134,12 @@ export class GeminiProvider implements AIProvider {
     const model = this.client!.getGenerativeModel(
       {
         model: modelName,
-        generationConfig: withNoThinking({
+        generationConfig: {
           temperature,
-          maxOutputTokens: 384,
+          maxOutputTokens: 1024,
           responseMimeType: "application/json",
           responseSchema: jobAnalysisResponseSchema,
-        }),
+        },
       },
       { timeout: REQUEST_TIMEOUT_MS },
     );
@@ -168,10 +159,10 @@ export class GeminiProvider implements AIProvider {
     const model = this.client!.getGenerativeModel(
       {
         model: modelName,
-        generationConfig: withNoThinking({
+        generationConfig: {
           temperature,
-          maxOutputTokens: 700,
-        }),
+          maxOutputTokens: 1200,
+        },
       },
       { timeout: REQUEST_TIMEOUT_MS },
     );
