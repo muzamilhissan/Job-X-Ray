@@ -107,7 +107,13 @@ export class GeminiProvider implements AIProvider {
       modelName,
       `${jobAnalysisSchemaHint}\n\n${buildAnalyzeJobPrompt(input)}`,
     );
-    const parsed = JobAnalysisSchema.safeParse(JSON.parse(this.extractJsonObject(text)));
+    let raw: unknown;
+    try {
+      raw = JSON.parse(this.extractJsonObject(text));
+    } catch {
+      throw new Error("The model returned incomplete JSON. Try X-Ray again.");
+    }
+    const parsed = JobAnalysisSchema.safeParse(raw);
     if (!parsed.success) {
       throw new Error(
         `Invalid AI response shape: ${parsed.error.issues[0]?.message ?? "unknown"}`,
@@ -131,16 +137,17 @@ export class GeminiProvider implements AIProvider {
   private async generateJson(
     modelName: string,
     prompt: string,
-    temperature = 0.2,
+    _temperature = 0.2,
   ): Promise<string> {
     const model = this.client!.getGenerativeModel(
       {
         model: modelName,
         generationConfig: {
-          maxOutputTokens: 1024,
+          maxOutputTokens: 8192,
           responseMimeType: "application/json",
           responseSchema: jobAnalysisResponseSchema,
-        },
+          thinkingConfig: { thinkingLevel: "minimal" },
+        } as Record<string, unknown>,
       },
       { timeout: REQUEST_TIMEOUT_MS },
     );
@@ -155,14 +162,15 @@ export class GeminiProvider implements AIProvider {
   private async generateText(
     modelName: string,
     prompt: string,
-    temperature = 0.5,
+    _temperature = 0.5,
   ): Promise<string> {
     const model = this.client!.getGenerativeModel(
       {
         model: modelName,
         generationConfig: {
-          maxOutputTokens: 1200,
-        },
+          maxOutputTokens: 2048,
+          thinkingConfig: { thinkingLevel: "minimal" },
+        } as Record<string, unknown>,
       },
       { timeout: REQUEST_TIMEOUT_MS },
     );
