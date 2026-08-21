@@ -12,7 +12,7 @@ import type { AIProvider } from "./AIProvider.js";
 import { buildAnalyzeJobPrompt } from "./prompts/analyzeJob.js";
 import { buildCoverLetterPrompt } from "./prompts/coverLetter.js";
 import { jobAnalysisSchemaHint } from "./prompts/schemaHint.js";
-import { JobAnalysisSchema } from "../validation/jobAnalysis.js";
+import { JobAnalysisSchema, coerceJobAnalysis } from "../validation/jobAnalysis.js";
 
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 /** Render will cut HTTP at ~60s; stay under that, but 20s was aborting mid-response. */
@@ -117,7 +117,7 @@ export class GeminiProvider implements AIProvider {
     } catch {
       throw new Error("The model returned incomplete JSON. Try X-Ray again.");
     }
-    const parsed = JobAnalysisSchema.safeParse(raw);
+    const parsed = JobAnalysisSchema.safeParse(coerceJobAnalysis(raw));
     if (!parsed.success) {
       throw new Error(
         `Invalid AI response shape: ${parsed.error.issues[0]?.message ?? "unknown"}`,
